@@ -1,0 +1,10 @@
+---
+tenants:
+-   fvTenant:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Created with AAP2.4
+            dn: uni/tn-Ansible
+            name: Ansible
+           
+           

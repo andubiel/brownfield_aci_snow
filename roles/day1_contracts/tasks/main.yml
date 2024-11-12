@@ -1,0 +1,91 @@
+---
+- name: CONFIGURE TENANT CONTRACT CONFIGURATIONS
+
+  #ignore_errors: true
+  block:
+    - name: Read Contract Info csv_files/day1/aci_contracts.csv
+      read_csv:
+        path: ../csv_files/day1/aci_contracts.csv # location of CSV file
+      register: aci_contracts
+      delegate_to: localhost
+
+    - name: Tenant Filters
+      cisco.aci.aci_filter:
+        tenant: "{{ filter_item.tenant | default(omit, True) }}"
+        filter: "{{ filter_item.filter | default(omit, True) }}"
+        description: "{{ filter_item.description | default(omit, True) }} for {{ filter_item.filter | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_contracts.list }}"
+      loop_control:
+        loop_var: filter_item
+        label: "{{ filter_item.filter }}"
+
+    - name: Filter Entries
+      cisco.aci.aci_filter_entry:
+        tenant: "{{ entry_item.tenant | default(omit, True) }}"
+        filter: "{{ entry_item.filter | default(omit, True) }}"
+        entry: "{{ entry_item.entry | default(omit, True) }}"
+        ether_type: "{{ entry_item.filter_entry_ether_type | default(omit, True) }}"
+        ip_protocol: "{{ entry_item.filter_entry_ip_protocol | default(omit, True) }}"
+        dst_port_start: "{{ entry_item.port | default(omit, True) }}"
+        dst_port_end: "{{ entry_item.port | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_contracts.list }}"
+      loop_control:
+        loop_var: entry_item
+        label: "{{ entry_item.entry }}"
+          
+    - name: Tenant Contracts
+      cisco.aci.aci_contract:
+        tenant: "{{ contract_item.tenant | default(omit, True) }}"
+        contract: "{{ contract_item.contract | default(omit, True) }}"
+        scope: "{{ contract_item.contract_scope | default(omit, True) }}"
+        description: "{{ contract_item.contract_description | default(omit, True) }} for {{ contract_item.contract | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_contracts.list }}"
+      loop_control:
+        loop_var: contract_item
+        label: "{{ contract_item.contract }}"
+          
+    - name: Contract Subjects
+      cisco.aci.aci_contract_subject:
+        tenant: "{{ subj_item.tenant | default(omit, True) }}"
+        contract: "{{ subj_item.contract | default(omit, True) }}"
+        subject: "{{ subj_item.subject | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_contracts.list }}"
+      loop_control:
+        loop_var: subj_item
+        label: "{{ subj_item.subject }}"
+
+    - name: Contracts Subjects Associated with Filters WITH FILTERS
+      cisco.aci.aci_contract_subject_to_filter:
+        tenant: "{{ filt_item.tenant | default(omit, True) }}"
+        contract: "{{ filt_item.contract | default(omit, True) }}"
+        subject: "{{ filt_item.subject | default(omit, True) }}"
+        filter: "{{ filt_item.filter | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_contracts.list }}"
+      loop_control:
+        loop_var: filt_item
+        label: "{{ filt_item.filter }}"
+
+    - name: Contract to EPG Binding
+      cisco.aci.aci_epg_to_contract:
+        tenant: "{{ contact_bind_item.tenant | default(omit, True) }}"
+        ap: "{{ contact_bind_item.ap | default(omit, True) }}"
+        epg: "{{ contact_bind_item.epg | default(omit, True) }}"
+        contract: "{{ contact_bind_item.contract | default(omit, True) }}"
+        contract_type: "{{ contact_bind_item.contract_type | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_contracts.list }}"
+      loop_control:
+        loop_var: contact_bind_item
+        label: epg_binding
+        

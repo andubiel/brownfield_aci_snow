@@ -1,0 +1,21 @@
+changed: false
+filters:
+-   vzFilter:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Created with AAP2.4 for http
+            dn: uni/tn-Ansible/flt-http
+            fwdId: '5'
+            id: implicit
+            name: http
+            revId: '6'
+-   vzFilter:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Created with AAP2.4 for sql
+            dn: uni/tn-Ansible/flt-sql
+            fwdId: '7'
+            id: implicit
+            name: sql
+            revId: '8'
+           

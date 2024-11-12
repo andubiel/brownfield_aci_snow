@@ -1,0 +1,30 @@
+---
+- name: HEALTH CHECK FOR NEW TENANT
+
+  #ignore_errors: true
+  block:
+    - name: Get Tenant Health Score
+      aci_rest:
+        path: /api/node/mo/uni/tn-{{tenant_item['fvTenant']['attributes']['name'] | default(omit, True)}}/health.json?query-target=self
+        method: get
+      register: health
+      loop: "{{ tenants }}"
+      loop_control:
+       loop_var: tenant_item
+       label: "{{ tenant_item['fvTenant']['attributes']['name'] | default(omit, True) }}"
+
+
+    - name: Set_fact
+      set_fact:
+        health_score: "{{ health.results | selectattr ('imdata') | map(attribute='imdata') }}"
+
+  
+    - name: Assert The Tenant Health Score is equal or greater than (94)
+      assert:
+        that: cur_item['healthInst']['attributes']['cur'] | int >= 94
+        fail_msg: "Failure! The Tenant Health Score is {{cur_item['healthInst']['attributes']['cur'] | int }} Please review faults"
+        success_msg: "Success! The Tenant Health Score is {{cur_item['healthInst']['attributes']['cur'] | int }}"
+      loop: '{{ health_score[0] }}'
+      loop_control:
+        loop_var: cur_item
+        label: "{{cur_item['healthInst']['attributes']['dn'] | split ('/h') | first | trim | split ('uni/tn-') | last | trim }}"

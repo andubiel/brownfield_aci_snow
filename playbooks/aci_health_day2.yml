@@ -1,0 +1,15 @@
+---
+- name: Validate ACI Health
+  hosts: apic
+  gather_facts: no
+
+  tasks:
+      
+    - name: load system role
+      include_role:
+       name: "{{ item }}"
+      loop: 
+        - "../roles/day2_health_score" 
+
+
+    

@@ -1,0 +1,21 @@
+changed: false
+provider:
+-   fvRsProv:
+        attributes:
+            annotation: orchestrator:ansible
+            ctrctUpd: ctrct
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-web/rsprov-web
+            forceResolve: 'yes'
+            tCl: vzBrCP
+            tDn: uni/tn-Ansible/brc-web
+            tType: name
+            tnVzBrCPName: web
+-   fvRsProv:
+        attributes:
+            annotation: orchestrator:ansible
+            ctrctUpd: ctrct
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-db/rsprov-database
+            tCl: vzBrCP
+            tDn: uni/tn-Ansible/brc-database
+            tType: name
+            tnVzBrCPName: database

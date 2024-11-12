@@ -1,0 +1,42 @@
+---
+- name: FABRIC ACCESS PORT TO PROFILE
+
+  ignore_errors: true
+
+  block:
+    - name: Read CSV File csv_files/day0/aci_fabric_access_port_to_profile.csv
+      read_csv:
+        path: ../csv_files/day0/aci_fabric_access_port_to_profile.csv # location of CSV file
+      register: aci_access_port_to_interface_policy_leaf_profile
+      delegate_to: localhost
+
+    - name: Add Interface Policy Leaf Profile
+      cisco.aci.aci_interface_policy_leaf_profile:
+        interface_profile: "{{ profile_item.interface_profile | default(omit, True) }}"
+        description: "{{ profile_item.description | default(omit, True) }}"
+        type: "{{ profile_item.type | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_access_port_to_interface_policy_leaf_profile.list }}"
+      loop_control:
+        loop_var: profile_item
+        label: "{{ profile_item.interface_profile }}"
+        
+    - name: Add Access Ports to Interface Policy Leaf Profile
+      cisco.aci.aci_access_port_to_interface_policy_leaf_profile:
+        interface_profile: "{{ access_item.interface_profile | default(omit, True)  }}"
+        access_port_selector: "{{ access_item.access_port_selector | default(omit, True)  }}"
+        description: "{{ access_item.description | default(omit, True)  }}"
+        policy_group: "{{ access_item.policy_group | default(omit, True) }}"
+        interface_type: "{{ access_item.interface_type | default(omit, True)  }}"
+        type: "{{ access_item.type | default(omit, True)  }}"
+        from_card: "{{ access_item.from_card | default(omit, True)  }}"
+        from_port: "{{ access_item.from_port | default(omit, True)  }}"
+        to_card: "{{ access_item.to_card  | default(omit, True) }}"
+        to_port: "{{ access_item.to_port | default(omit, True)  }}"
+        port_blk: "{{ access_item.port_blk  | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_access_port_to_interface_policy_leaf_profile.list }}"
+      loop_control:
+        loop_var: access_item

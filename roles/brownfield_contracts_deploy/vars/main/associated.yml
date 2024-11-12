@@ -1,0 +1,34 @@
+---
+associated:
+-   vzRsSubjFiltAtt:
+        attributes:
+            action: permit
+            annotation: orchestrator:ansible
+            dn: uni/tn-Ansible/brc-web/subj-http/rssubjFiltAtt-http
+            forceResolve: 'yes'
+            tCl: vzFilter
+            tDn: uni/tn-Ansible/flt-http
+            tType: name
+            tnVzFilterName: http
+-   vzRsSubjFiltAtt:
+        attributes:
+            action: permit
+            annotation: orchestrator:ansible
+            dn: uni/tn-Ansible/brc-database/subj-sql/rssubjFiltAtt-sql
+            forceResolve: 'yes'
+            tCl: vzFilter
+            tDn: uni/tn-Ansible/flt-sql
+            tType: name
+            tnVzFilterName: sql
+-   vzRsSubjFiltAtt:
+        attributes:
+            action: permit
+            annotation: orchestrator:ansible
+            dn: uni/tn-Ansible/brc-web/subj-sql/rssubjFiltAtt-sql
+            forceResolve: 'yes'
+            tCl: vzFilter
+            tDn: uni/tn-Ansible/flt-sql
+            tType: name
+            tnVzFilterName: sql
+            
+

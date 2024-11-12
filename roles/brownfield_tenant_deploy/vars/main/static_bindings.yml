@@ -1,0 +1,47 @@
+---
+static_bindings:
+-   fvRsPathAtt:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-web/rspathAtt-[topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1A]]
+            encap: vlan-300
+            forceResolve: 'yes'
+            instrImedcy: immediate
+            mode: regular
+            tCl: fabricPathEp
+            tDn: topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1A]
+-   fvRsPathAtt:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-web/rspathAtt-[topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1B]]
+            encap: vlan-300
+            forceResolve: 'yes'
+            instrImedcy: immediate
+            mode: regular
+            tCl: fabricPathEp
+            tDn: topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1B]
+-   fvRsPathAtt:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-db/rspathAtt-[topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1A]]
+            encap: vlan-301
+            forceResolve: 'yes'
+            instrImedcy: immediate
+            tCl: fabricPathEp
+            tDn: topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1A]
+-   fvRsPathAtt:
+        attributes:
+            annotation: orchestrator:ansible
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-db/rspathAtt-[topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1B]]
+            encap: vlan-301
+            forceResolve: 'yes'
+            instrImedcy: immediate
+            lcC: ''
+            mode: regular
+            tCl: fabricPathEp
+            tDn: topology/pod-1/protpaths-101-102/pathep-[Ansible_FI-1B]
+          
+

@@ -1,0 +1,137 @@
+---
+- name: DEPLOY TENANT CONFIG
+
+  #ignore_errors: true
+  block:
+    - name: Deploy Tenants
+      cisco.aci.aci_tenant:   
+        tenant: "{{ tenant_item['fvTenant']['attributes']['name'] | default(omit, True) }}"
+        description: "{{ tenant_item['fvTenant']['attributes']['descr']| default(omit, True) }}"
+        timeout: 60
+      retries: 2
+      async: 60
+      poll: 0
+      loop: "{{ tenants }}"
+      loop_control:
+        loop_var: tenant_item
+        label: "{{ tenant_item['fvTenant']['attributes']['name'] }}-{{ tenant_item['fvTenant']['attributes']['descr'] }}"
+
+    - name: Deploy APs
+      cisco.aci.aci_ap:   
+        timeout: 60  
+        annotation: "{{ ap_item['fvAp']['attributes']['annotation'] | default(omit, True) }}"
+        ap: "{{ ap_item['fvAp']['attributes']['name'] | default(omit, True) }}"
+        description: "{{ ap_item['fvAp']['attributes']['descr'] | default(omit, True) }}"
+        tenant: "{{ ap_item['fvAp']['attributes']['dn'] | split ('/ap-') | first | trim | split ('uni/tn-') | last | trim }}"
+      retries: 2
+      async: 60
+      poll: 0
+      loop: "{{ aps }}"
+      loop_control:
+        loop_var: ap_item
+        label: "{{ ap_item['fvAp']['attributes']['dn'] | split ('/ap-') | first | trim | split ('uni/tn-') | last | trim }}-{{ ap_item['fvAp']['attributes']['name'] }}"
+
+    - name: Create VRF
+      cisco.aci.aci_vrf:   
+        annotation: "{{ vrf_item['fvCtx']['attributes']['annotation'] | default(omit, True) }}"
+        vrf_name: "{{ vrf_item['fvCtx']['attributes']['name'] | default(omit, True) }}"
+        description: "{{ vrf_item['fvCtx']['attributes']['name'] | default(omit, True) }}"
+        policy_control_direction: "{{ vrf_item['fvCtx']['attributes']['pcEnfDir'] | default(omit, True) }}"
+        policy_control_preference: "{{ vrf_item['fvCtx']['attributes']['pcEnfPref'] | default(omit, True) }}"
+        preferred_group: "{{ vrf_item['fvCtx']['children']['vzAny']['attributes']['prefGrMemb'] | default(omit, True) }}"
+        tenant: "{{ vrf_item['fvCtx']['attributes']['dn'] | split ('/ctx-') | first | trim | split ('uni/tn-') | last | trim }}"
+      retries: 2
+      async: 60
+      poll: 0
+      loop: "{{ vrfs }}"
+      loop_control:
+        loop_var: vrf_item
+        label: "{{ vrf_item['fvCtx']['attributes']['dn'] | split ('/ctx-') | first | trim | split ('uni/tn-') | last | trim }}-{{ vrf_item['fvCtx']['attributes']['name'] | default(omit, True) }}"
+    
+    - name: Deploy BDs
+      cisco.aci.aci_bd:   
+        timeout: 60
+        allow_intersite_bum_traffic: "{{ bd_item['fvBD']['attributes']['intersiteBumTrafficAllow'] | default(omit, True) }}"
+        allow_intersite_l2_stretch: "{{ bd_item['fvBD']['attributes']['intersiteL2Stretch'] | default(omit, True) }}"
+        allow_ipv6_multicast: "{{ bd_item['fvBD']['attributes']['ipv6McastAllow'] | default(omit, True) }}"
+        annotation: "{{ bd_item['fvBD']['attributes']['annotation'] | default(omit, True) }}"
+        arp_flooding: "{{ bd_item['fvBD']['attributes']['arpFlood'] | default(omit, True) }}"
+        bd: "{{ bd_item['fvBD']['attributes']['name'] | default(omit, True) }}"
+        description: "{{ bd_item['fvBD']['attributes']['descr'] | default(omit, True) }}"
+        enable_multicast: "{{ bd_item['fvBD']['attributes']['mcastAllow'] | default(omit, True) }}"
+        enable_routing: "{{ bd_item['fvBD']['attributes']['unicastRoute'] | default(omit, True) }}"
+        endpoint_clear: "{{ bd_item['fvBD']['attributes']['epClear'] | default(omit, True) }}"
+        endpoint_move_detect: "{{ bd_item['fvBD']['attributes']['epMoveDetectMode'] | default(omit, True) }}"
+        host_based_routing: "{{ bd_item['fvBD']['attributes']['hostBasedRouting'] | default(omit, True) }}"
+        ip_learning: "{{  bd_item['fvBD']['attributes']['ipLearning'] | default(omit, True) }}"
+        ipv6_l3_unknown_multicast: "{{  bd_item['fvBD']['attributes']['v6unkMcastAct'] | default(omit, True) }}"
+        ipv6_nd_policy: "{{ bd_item['fvBD']['attributes']['v6unkMcastAct'] | default(omit, True) }}"
+        l2_unknown_unicast: "{{ bd_item['fvBD']['attributes']['unkMacUcastAct'] | default(omit, True) }}"
+        l3_unknown_multicast: "{{ bd_item['fvBD']['attributes']['unkMcastAct'] | default(omit, True) }}"
+        limit_ip_learn: "{{ bd_item['fvBD']['attributes']['limitIpLearnToSubnets'] | default(omit, True) }}"
+        link_local_address: "{{  bd_item['fvBD']['attributes']['llAddr'] | default(omit, True) }}"
+        mac_address: "{{ bd_item['fvBD']['attributes']['mac'] | default(omit, True) }}"
+        optimize_wan_bandwidth: "{{ bd_item['fvBD']['attributes'] ['OptimizeWanBandwidth'] | default(omit, True) }}"
+        tenant: "{{ bd_item['fvBD']['attributes']['dn'] | split ('/BD') | first | trim | split ('uni/tn-') | last | trim }}"
+      retries: 2
+      #async: 60
+      #poll: 0
+      loop: "{{ bds }}"
+      loop_control:
+        loop_var: bd_item
+        label: "{{ bd_item['fvBD']['attributes']['dn'] | split ('/BD') | first | trim | split ('uni/tn-') | last | trim }}-{{ bd_item['fvBD']['attributes']['name'] }}"
+  
+    - name: Deploy BD Subnets
+      cisco.aci.aci_bd_subnet:     
+        timeout: 60
+        annotation: "{{ bd_subnets_item['fvSubnet']['attributes']['annotation'] | default(omit, True) }}"
+        description: "{{ bd_subnets_item['fvSubnet']['attributes']['descr'] | default(omit, True) }}"
+        bd: "{{ bd_subnets_item['fvSubnet']['attributes']['dn'] | split ('/BD-') | last | trim | split ('/subnet') | first | trim }}"
+        subnet_name: "{{ bd_subnets_item['fvSubnet']['attributes']['name'] | default(omit, True) }}"
+        gateway: "{{ bd_subnets_item['fvSubnet']['attributes']['ip'] | split ('/') | first | trim }}"
+        mask:  "{{ bd_subnets_item['fvSubnet']['attributes']['ip'] | split ('/') | last | trim }}"
+        scope: "{{ bd_subnets_item['fvSubnet']['attributes']['scope'] | default(omit, True) }}"
+        preferred: "{{ bd_subnets_item['fvSubnet']['attributes']['preferred'] | default(omit, True) }}"
+        tenant: "{{ bd_subnets_item['fvSubnet']['attributes']['dn'] | split ('/BD') | first | trim | split ('uni/tn-') | last | trim }}"
+      retries: 2
+      async: 60
+      poll: 0
+      loop: "{{ bd_subnets }}"
+      loop_control:
+        loop_var: bd_subnets_item
+        label: "{{ bd_subnets_item['fvSubnet']['attributes']['dn'] | split ('/BD') | first | trim | split ('uni/tn-') | last | trim }}-{{ bd_subnets_item['fvSubnet']['attributes']['dn'] | split ('/BD-') | last | trim | split ('/subnet') | first | trim }}-{{ bd_subnets_item['fvSubnet']['attributes']['name'] }}"
+      register: bd_subnet
+
+    - name: Create EPGs
+      cisco.aci.aci_epg:    
+        tenant: "{{ epg_item['fvAEPg']['attributes']['dn'] | split ('/ap') | first | trim | split ('uni/tn-') | last | trim }}"
+        ap: "{{ epg_item['fvAEPg']['attributes']['dn'] | split ('/ap-') | last | trim  | split ('/epg') | first | trim }}"
+        epg: "{{ epg_item['fvAEPg']['attributes']['name'] | default(omit, True) }}"
+        bd: "{{ epg_item['fvAEPg']['children']['fvRsBd']['tnFvBDName'] | default(omit, True) }}"
+      retries: 2
+      async: 60
+      poll: 0
+      loop: "{{ epgs }}"
+      loop_control:
+        loop_var: epg_item
+        label: "{{ epg_item['fvAEPg']['attributes']['dn'] | split ('/ap') | first | trim | split ('uni/tn-') | last | trim }}-{{ epg_item['fvAEPg']['attributes']['name'] | default(omit, True) }}"
+    
+    - name: "cisco.aci.aci_static_binding_to_epg"
+      cisco.aci.aci_static_binding_to_epg:   
+        tenant: "{{ binding_item['fvRsPathAtt']['attributes']['dn'] | split ('/ap') | first | trim | split ('uni/tn-') | last | trim }}"
+        ap: "{{ binding_item['fvRsPathAtt']['attributes']['dn'] | split ('/epg') | first | trim | split ('ap-') | last | trim }}"
+        epg: "{{ binding_item['fvRsPathAtt']['attributes']['dn'] | split ('/rspathAtt') | first | trim | split ('epg-') | last | trim }}"
+        encap_id: "{{ binding_item['fvRsPathAtt']['attributes']['encap'] | split ('-') | last | trim }}"
+        deploy_immediacy: "{{ binding_item['fvRsPathAtt']['attributes']['instrImedcy'] | default(omit, True) }}"
+        interface: "{{ binding_item['fvRsPathAtt']['attributes']['tDn'] | split (']') | first | trim  | split ('[') | last | trim }}"
+        pod_id: "{{ binding_item['fvRsPathAtt']['attributes']['tDn'] | split ('/pro') | first | trim  | split ('pod-') | last | trim }}"
+        leafs: "{{ binding_item['fvRsPathAtt']['attributes']['tDn'] | split ('/pat') | first | trim  | split ('s-') | last | trim }}"
+        interface_type: vpc
+        interface_mode: trunk
+      retries: 2
+      async: 60
+      poll: 0
+      loop: "{{ static_bindings }}"
+      loop_control:
+        loop_var: binding_item
+        label: "{{ binding_item['fvRsPathAtt']['attributes']['dn'] | split ('/ap') | first | trim | split ('uni/tn-') | last | trim }}-{{ binding_item['fvRsPathAtt']['attributes']['dn'] | split ('/rspathAtt') | first | trim | split ('epg-') | last | trim }}"

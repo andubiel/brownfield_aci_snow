@@ -1,0 +1,103 @@
+---
+- name: STATIC BINDING TO EPG
+
+  #ignore_errors: true
+
+  block:
+    - name: Read CSV File
+      read_csv:
+        path: ../csv_files/day1/aci_static_binding.csv # location of CSV file
+      register: aci_static_binding_to_epg
+      delegate_to: localhost
+
+    - name: Create Tenant
+      cisco.aci.aci_tenant:
+        tenant: "{{ tenant_item.tenant | default(omit, True) }}"
+        description: "{{ tenant_item.description | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list }}"
+      loop_control:
+        loop_var: tenant_item
+        label: "{{ tenant_item.tenant }}"
+
+    - name: Create Application Policy
+      cisco.aci.aci_ap:
+        tenant: "{{ ap_item.tenant | default(omit, True) }}"
+        ap: "{{ ap_item.ap | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list }}"
+      loop_control:
+        loop_var: ap_item
+        label: "{{ ap_item.ap }}"
+
+    - name: Create VRF
+      aci_vrf:
+        tenant: "{{  vrf_item.tenant | default(omit, True) }}"
+        vrf_name: "{{ vrf_item.vrf | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list }}"
+      loop_control:
+        loop_var: vrf_item
+        label: "{{ vrf_item.vrf }}"
+
+    - name: Create BDs
+      aci_bd:
+        tenant: "{{ bd_item.tenant | default(omit, True) }}"
+        vrf: "{{ bd_item.vrf | default(omit, True) }}"
+        bd: "{{ bd_item.bd | default(omit, True) }}"
+        enable_routing: yes
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list }}"
+      loop_control:
+        loop_var: bd_item
+        label: "{{ bd_item.bd }}"
+
+    - name: CREATE BD SUBNETs
+      aci_bd_subnet:
+        tenant: "{{ subnet_item.tenant | default(omit, True) }}"
+        bd: "{{ subnet_item.bd | default(omit, True) }}"
+        gateway: "{{ subnet_item.subnet | default(omit, True) }}"
+        mask: "{{ subnet_item.mask | default(omit, True) }}"
+        scope: "{{ subnet_item.scope | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list }}"
+      loop_control:
+        loop_var: subnet_item
+        label: "{{ subnet_item.subnet }}"
+        
+    - name: Create EPGs
+      cisco.aci.aci_epg:
+        tenant: "{{ epg_item.tenant | default(omit, True)  }}"
+        ap: "{{ epg_item.ap | default(omit, True)  }}"
+        epg: "{{ epg_item.epg | default(omit, True) }}"
+        bd: "{{ epg_item.bd | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list | default(omit, True) }}"
+      loop_control:
+        loop_var: epg_item
+        label: "{{ epg_item.epg }}"
+
+    - name: "cisco.aci.aci_static_binding_to_epg"
+      cisco.aci.aci_static_binding_to_epg:
+        tenant: "{{ binding_item.tenant | default(omit, True) }}"
+        ap: "{{ binding_item.ap | default(omit, True) }}"
+        epg: "{{ binding_item.epg | default(omit, True) }}"
+        encap_id: "{{ binding_item.encap_id | default(omit, True)  }}"
+        deploy_immediacy: "{{ binding_item.deploy_immediacy | default(omit, True)  }}"
+        interface_mode: "{{ binding_item.interface_mode | default(omit, True) }}"
+        interface_type: "{{ binding_item.interface_type | default(omit, True) }}"
+        interface: "{{ binding_item.interface | default(omit, True) }}"
+        pod_id: "{{ binding_item.pod_id | default(omit, True) }}"
+        leafs: "{{ binding_item.leafs | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_static_binding_to_epg.list }}"
+      loop_control:
+        loop_var: binding_item
+        

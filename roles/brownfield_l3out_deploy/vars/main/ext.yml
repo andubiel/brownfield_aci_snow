@@ -1,0 +1,11 @@
+changed: false
+ext:
+-   l3extInstP:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/out-Ansible_l3out/instP-Ansible_external_corporate
+            name: Ansible_external_corporate
+            prio: level3
+            scope: '2654213'
+           

@@ -1,0 +1,30 @@
+---
+subjects:
+-   vzSubj:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/brc-web/subj-http
+            name: http
+            consMatchT: AtleastOne
+            provMatchT: AtleastOne
+            revFltPorts: 'yes'
+-   vzSubj:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/brc-database/subj-sql
+            name: sql
+            provMatchT: AtleastOne
+            consMatchT: AtleastOne
+            revFltPorts: 'yes'
+-   vzSubj:
+        attributes:
+            annotation: orchestrator:ansible
+            consMatchT: AtleastOne
+            descr: ''
+            dn: uni/tn-Ansible/brc-web/subj-sql
+            name: sql
+            provMatchT: AtleastOne
+            revFltPorts: 'yes'
+           

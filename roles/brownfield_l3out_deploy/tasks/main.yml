@@ -1,0 +1,60 @@
+---
+- name: DEPLOY L3OUT
+
+  #ignore_errors: true
+  block:
+    - name: Add a new L3Out
+      cisco.aci.aci_l3out:      
+        annotation: "{{ l3out_item['l3extOut']['attributes']['annotation'] | default(omit, True) }}"
+        tenant: "{{ l3out_item['l3extOut']['attributes']['dn'] | split ('/out-') | first | trim | split ('uni/tn-') | last | trim }}" 
+        description: "{{ l3out_item['l3extOut']['attributes']['descr'] | default(omit, True) }}"
+        name: "{{ l3out_item['l3extOut']['attributes']['name'] | default(omit, True) }}"
+        domain: Ansible_external_corporate 
+        vrf: "{{ l3out_item['l3extOut']['children'][1]['l3extRsEctx']['attributes']['tnFvCtxName'] | default(omit, True) }}"
+        route_control: "{{ l3out_item['l3extOut']['attributes']['enforceRtctrl'] | default(omit, True) }}"
+        l3protocol: static
+        timeout: 60
+      retries: 2
+      delay: 10
+      async: 60
+      poll: 0
+      loop: "{{ l3out }}"
+      loop_control:
+        loop_var: l3out_item
+        label: "{{ l3out_item['l3extOut']['attributes']['dn'] | split ('/out-') | first | trim | split ('uni/tn-') | last | trim }}-{{ l3out_item['l3extOut']['attributes']['name'] | default(omit, True) }}"
+      
+    - name: Add a new ExtEpg
+      cisco.aci.aci_l3out_extepg:      
+        annotation: "{{ ext_item['l3extInstP']['attributes']['annotation'] | default(omit, True) }}"
+        tenant: "{{ ext_item['l3extInstP']['attributes']['dn'] | split ('/out-') | first | trim | split ('uni/tn-') | last | trim }}" 
+        l3out: "{{ ext_item['l3extInstP']['attributes']['dn'] | split ('/instP-') | first | trim | split ('out-') | last | trim }}" 
+        name: "{{ ext_item['l3extInstP']['attributes']['name'] | default(omit, True) }}"
+        timeout: 60
+      retries: 2
+      delay: 10
+      async: 60
+      poll: 0
+      loop: "{{ ext }}"
+      loop_control:
+        loop_var: ext_item
+        label: "{{ ext_item['l3extInstP']['attributes']['dn'] | split ('/out-') | first | trim | split ('uni/tn-') | last | trim }}-{{ ext_item['l3extInstP']['attributes']['name'] | default(omit, True) }}"
+
+    - name: Bind a Provider contract to an external EPG
+      cisco.aci.aci_l3out_extepg_to_contract:     
+        annotation: "{{ bind_provider_item['fvRsProv']['attributes']['annotation'] | default(omit, True) }}"
+        tenant: "{{ bind_provider_item['fvRsProv']['attributes']['tDn'] | split ('/brc-') | first | trim | split ('uni/tn-') | last | trim }}" 
+        l3out: "{{ bind_provider_item['fvRsProv']['attributes']['dn'] | split ('/instP-') | first | trim | split ('out-') | last | trim }}" 
+        extepg: "{{ bind_provider_item['fvRsProv']['attributes']['dn'] | split ('/rsprov-') | first | trim | split ('instP-') | last | trim }}" 
+        contract: "{{ bind_provider_item['fvRsProv']['attributes']['tnVzBrCPName'] | default(omit, True) }}"
+        contract_type: provider
+        timeout: 60
+      retries: 2
+      delay: 10
+      async: 60
+      poll: 0
+      loop: "{{ bind_provider }}"
+      loop_control:
+        loop_var: bind_provider_item
+        label: "{{ bind_provider_item['fvRsProv']['attributes']['tDn'] | split ('/brc-') | first | trim | split ('uni/tn-') | last | trim }}-{{ bind_provider_item['fvRsProv']['attributes']['dn'] | split ('/rsprov-') | first | trim | split ('instP-') | last | trim }}"
+   
+    

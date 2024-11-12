@@ -1,0 +1,23 @@
+---
+vrfs:
+-   fvCtx:
+        attributes:
+            annotation: orchestrator:ansible
+            bdEnforcedEnable: 'no'
+            descr: ''
+            dn: uni/tn-Ansible/ctx-Ansible_vrf
+            ipDataPlaneLearning: enabled
+            knwMcastAct: permit
+            name: Ansible_vrf
+            pcEnfDir: ingress
+            pcEnfDirUpdated: 'yes'
+            pcEnfPref: enforced
+            scope: '2654213'
+            seg: '2654213'
+        children:
+        -   vzAny:
+                attributes:
+                    annotation: ''
+                    descr: ''
+                    matchT: AtleastOne
+                    name: ''

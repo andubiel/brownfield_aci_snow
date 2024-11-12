@@ -1,0 +1,75 @@
+---
+leaf_profile:
+-   infraHPortS:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Brownfield
+            dn: uni/infra/accportprof-Ansible_FI-1A/hports-ethernet1_22-24-typ-range
+            name: ethernet1_25-27
+            type: range
+        children:
+        -   infraPortBlk:
+                attributes:
+                    descr: ''
+                    fromCard: '1'
+                    fromPort: '25'
+                    lcOwn: local
+                    name: ethernet1_25-27
+                    toCard: '1'
+                    toPort: '27'
+        -   infraRsAccBaseGrp:
+                attributes:
+                    annotation: ''
+                    fexId: '101'
+                    forceResolve: 'yes'
+                    lcOwn: local
+                    tDn: uni/infra/funcprof/accbundle-Ansible_FI-1A
+-   infraHPortS:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Brownfield
+            dn: uni/infra/accportprof-Ansible_FI-1B/hports-ethernet1_28-30-typ-range
+            name: ethernet1_28-30
+            type: range
+        children:
+        -   infraPortBlk:
+                attributes:
+                    annotation: ''
+                    descr: ''
+                    fromCard: '1'
+                    fromPort: '28'
+                    name: ethernet1_28-30
+                    toCard: '1'
+                    toPort: '30'
+        -   infraRsAccBaseGrp:
+                attributes:
+                    annotation: ''
+                    fexId: '101'
+                    forceResolve: 'yes'
+                    lcOwn: local
+                    tDn: uni/infra/funcprof/accbundle-Ansible_FI-1B
+                   
+-   infraHPortS:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Brownfield
+            dn: uni/infra/accportprof-Ansible_corporate_external/hports-ethernet1_50-typ-range
+            name: ethernet1_50
+            type: range
+        children:
+        -   infraPortBlk:
+                attributes:
+                    annotation: ''
+                    descr: ''
+                    fromCard: '1'
+                    fromPort: '50'
+                    name: ethernet1_50
+                    toCard: '1'
+                    toPort: '50'
+        -   infraRsAccBaseGrp:
+                attributes:
+                    annotation: ''
+                    fexId: '101'
+                    forceResolve: 'yes'
+                    tDn: uni/infra/funcprof/accbundle-Ansible_corporate_external
+                   

@@ -1,0 +1,24 @@
+---
+entries:
+-   vzEntry:
+        attributes:
+            annotation: orchestrator:ansible
+            dFromPort: http
+            dToPort: http
+            descr: ''
+            dn: uni/tn-Ansible/flt-http/e-http
+            etherT: ip
+            name: http
+            prot: tcp
+            stateful: 'no'
+-   vzEntry:
+        attributes:
+            annotation: orchestrator:ansible
+            dFromPort: '1433'
+            dToPort: '1433'
+            descr: ''
+            dn: uni/tn-Ansible/flt-sql/e-sql
+            etherT: ip
+            name: sql
+            prot: tcp
+            stateful: 'no'

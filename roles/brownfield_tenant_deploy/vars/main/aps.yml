@@ -1,0 +1,11 @@
+---
+aps:
+-   fvAp:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/ap-Ansible_AP
+            name: Ansible_AP
+            prio: unspecified
+          
+

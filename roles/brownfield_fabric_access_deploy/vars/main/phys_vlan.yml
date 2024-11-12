@@ -1,0 +1,14 @@
+---
+phys_vlan:
+-   l3extDomP:
+        attributes:
+            annotation: orchestrator:ansible
+            dn: uni/l3dom-Ansible_corporate_external
+            name: Ansible_corporate_external
+        children:
+        -   infraRsVlanNs:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: fvnsVlanInstP
+                    tDn: uni/infra/vlanns-[Ansible_general_pool]-static

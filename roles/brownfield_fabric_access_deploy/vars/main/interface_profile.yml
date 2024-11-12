@@ -1,0 +1,21 @@
+---
+interface_profile:
+-   infraAccPortP:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Brownfield
+            dn: uni/infra/accportprof-Ansible_FI-1A
+            name: Ansible_FI-1A
+-   infraAccPortP:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Brownfield
+            dn: uni/infra/accportprof-Ansible_FI-1B
+            name: Ansible_FI-1B
+-   infraAccPortP:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Brownfield
+            dn: uni/infra/accportprof-Ansible_corporate_external
+            name: Ansible_corporate_external
+        

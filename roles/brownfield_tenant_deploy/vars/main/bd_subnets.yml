@@ -1,0 +1,13 @@
+---
+bd_subnets:
+-   fvSubnet:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/BD-Ansible_bd/subnet-[10.10.10.1/23]
+            ip: 10.10.10.1/23
+            ipDPLearning: enabled
+            name: ''
+            preferred: 'no'
+            scope: private
+        

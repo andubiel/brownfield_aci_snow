@@ -1,0 +1,20 @@
+---
+- name: Brownfield Changes to SSOT (Existing Configs)
+  hosts: apic
+  gather_facts: no
+
+  tasks:
+  
+  - name: load system role
+    include_role:
+       name: "{{ item }}"
+    loop: 
+      - "../roles/brownfield_fabric_access_deploy"
+      - "../roles/brownfield_tenant_deploy" 
+      - "../roles/brownfield_contracts_deploy"
+      - "../roles/brownfield_l3out_deploy" 
+   
+        
+
+
+    

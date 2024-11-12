@@ -1,0 +1,112 @@
+---
+- name: FABRIC ACCESS POLICIES
+
+  ignore_errors: true
+
+  block:
+    - name: Read CSV File csv_files/aci_fabric_access_sw_profile_selector.csv
+      community.general.read_csv:
+        path: ../csv_files/day0/aci_fabric_access_sw_profile_selector.csv # location of CSV file
+      register: sw_profile_selector
+      delegate_to: localhost
+
+    - name: Create Switch Policy Profiles
+      cisco.aci.aci_switch_policy_leaf_profile:
+        leaf_profile: "{{sw_pol_item.sw_policy_profile | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ sw_profile_selector.list }}"
+      loop_control:
+        loop_var: sw_pol_item
+        label: "{{sw_pol_item.sw_policy_profile}}"
+
+    - name: ASSOCIATING AN INTERFACE SELECTOR PROFILE TO A SWITCH POLICY LEAF PROFILE
+      cisco.aci.aci_interface_selector_to_switch_policy_leaf_profile:
+        leaf_profile: "{{ sw_pol_selector_item.sw_policy_profile | default(omit, True) }}"
+        interface_selector: "{{ sw_pol_selector_item.interface_selector_profile | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ sw_profile_selector.list }}"
+      loop_control:
+        loop_var: sw_pol_selector_item
+        label: "{{ sw_pol_selector_item.interface_selector_profile }}"
+
+    - name: Read CSV File csv_files/aci_fabric_access_policies.csv
+      community.general.read_csv:
+        path: ../csv_files/day0/aci_fabric_access_policies.csv # location of CSV file
+      register: aci_fabric_access
+      delegate_to: localhost
+
+    - name: Create CDP Interface Policy to enable/disable CDP
+      cisco.aci.aci_interface_policy_cdp:
+        name: "{{  cdp_item.cdp_policy | default(omit, True) }}"
+        admin_state: "{{ cdp_item.cdp_enabled | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_fabric_access.list }}"
+      loop_control:
+        loop_var: cdp_item
+        label: "{{  cdp_item.cdp_policy }}"
+
+    - name: Create MCP Interface Policy to enable/disable MCP
+      cisco.aci.aci_interface_policy_mcp:
+        mcp: "{{  mcp_item.mcp_policy | default(omit, True) }}"
+        admin_state: "{{ mcp_item.mcp_enabled | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_fabric_access.list }}"
+      loop_control:
+        loop_var: mcp_item
+        label: "{{  mcp_item.mcp_policy }}"
+         
+    - name: Create LLDP Interface Policy to enable/disable LLDP
+      cisco.aci.aci_interface_policy_lldp:
+        name: "{{  lldp_item.lldp_policy | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_fabric_access.list }}"
+      loop_control:
+        loop_var: lldp_item
+        label: "{{  lldp_item.lldp_policy }}"
+
+    - name: Create a Link Level Policy
+      cisco.aci.aci_interface_policy_link_level:
+        link_level_policy: "{{  level_item.link_level_policy | default(omit, True) }}"
+        description: via Ansible
+        auto_negotiation: on
+        speed: 10G
+        link_debounce_interval: 100
+        forwarding_error_correction: cl91-rs-fec
+      retries: 2
+      delay: 5
+      loop: "{{ aci_fabric_access.list }}"
+      loop_control:
+        loop_var: level_item
+        label: "{{  level_item.link_level_policy }}"
+
+    - name: Add Interface Polices to leaf policy group
+      cisco.aci.aci_interface_policy_leaf_policy_group:
+        policy_group: "{{  add_ifselector_item.policy_group | default(omit, True)  }}"
+        description: "{{  add_ifselector_item.pg_descr | default(omit, True)  }}"
+        lag_type: "{{  add_ifselector_item.lag_type | default(omit, True)  }}"
+        link_level_policy: "{{  add_ifselector_item.link_level_policy }}"
+        cdp_policy: "{{  add_ifselector_item.cdp_policy | default(omit, True) }}"
+        mcp_policy: "{{  add_ifselector_item.mcp_policy | default(omit, True) }}"
+        lldp_policy: "{{  add_ifselector_item.lldp_policy | default(omit, True) }}"
+        # stp_interface_policy: "{{  add_ifselector_item.stp_interface_policy }}"
+        # egress_data_plane_policing_policy: "{{  add_ifselector_item.egress_data_plane_policing_policy }}"
+        # ingress_data_plane_policing_policy: "{{  add_ifselector_item.ingress_data_plane_policing_policy }}"
+        # priority_flow_control_policy: "{{  add_ifselector_item.priority_flow_control_policy }}"
+        # fibre_channel_interface_policy: "{{  add_ifselector_item.fibre_channel_interface_policy }}"
+        # slow_drain_policy: "{{  add_ifselector_item.slow_drain_policy }}"
+        port_channel_policy: "{{  add_ifselector_item.port_channel_policy | default(omit, True) }}"
+        # monitoring_policy: "{{  add_ifselector_item.monitoring_policy }}"
+        # storm_control_interface_policy: "{{  add_ifselector_item.storm_control_interface_policy }}"
+        # l2_interface_policy: "{{  add_ifselector_item.l2_interface_policy }}"
+        # port_security_policy: "{{  add_ifselector_item.port_security_policy }}"
+        aep: "{{  add_ifselector_item.aep | default(omit, True)  }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_fabric_access.list }}"
+      loop_control:
+        loop_var: add_ifselector_item

@@ -1,0 +1,23 @@
+---
+l3out:
+-   l3extOut:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/out-Ansible_l3out
+            mplsEnabled: 'no'
+            name: Ansible_l3out
+        children:
+        -   l3extRsL3DomAtt:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: extnwDomP
+                    tDn: uni/l3dom-Ansible_external_corporate
+        -   l3extRsEctx:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: fvCtx
+                    tDn: uni/tn-Ansible/ctx-Ansible_vrf
+                    tnFvCtxName: Ansible_vrf

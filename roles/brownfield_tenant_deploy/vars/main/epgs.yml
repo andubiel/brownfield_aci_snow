@@ -1,0 +1,61 @@
+---
+epgs:
+-   fvAEPg:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-web
+            floodOnEncap: disabled
+            name: web
+            prio: unspecified
+            scope: '2654213'
+            shutdown: 'no'
+        children:
+        -   fvRsBd:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: fvBD
+                    tDn: uni/tn-Ansible/BD-Ansible_bd
+                    tnFvBDName: Ansible_bd
+                children:
+                -   fvSubnetBDDefCont:
+                        attributes:
+                            bddefDn: uni/bd-[uni/tn-Ansible/BD-Ansible_bd]-isSvc-no
+                            name: ''
+        -   fvRsCustQosPol:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: qosCustomPol
+                    tDn: uni/tn-common/qoscustom-default
+                    tType: name
+                   
+-   fvAEPg:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-db
+            name: db
+            scope: '2654213'
+            shutdown: 'no'
+        children:
+        -   fvRsBd:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: fvBD
+                    tDn: uni/tn-Ansible/BD-Ansible_bd
+                    tRn: BD-Ansible_bd
+                    tnFvBDName: Ansible_bd
+                children:
+                -   fvSubnetBDDefCont:
+                        attributes:
+                            bddefDn: uni/bd-[uni/tn-Ansible/BD-Ansible_bd]-isSvc-no
+                            name: ''
+        -   fvRsCustQosPol:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    tCl: qosCustomPol
+                    tDn: uni/tn-common/qoscustom-default

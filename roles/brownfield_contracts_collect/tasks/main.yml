@@ -1,0 +1,141 @@
+---
+- name: READ CONTRACTS CONFIG
+
+  #ignore_errors: true
+
+  block:
+    #FILTERS
+    - name: Create a defaults directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/"
+        state: directory
+        mode: '0755'
+      
+    - name: Read Filters
+      cisco.aci.aci_filter:
+        state: query
+        timeout: 60
+      register: filters
+      retries: 2
+        
+    - name: Add filters to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ filters | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/filters.yml"
+
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/filters.yml"
+        regexp: 'current'
+        replace: 'filters'
+
+   #FILTER ENTRIES
+    - name: Read Filter Entries 
+      cisco.aci.aci_filter_entry:
+        state: query
+      register: entries
+      retries: 2
+        
+    - name: Add filter_entries to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ entries  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/entries.yml"
+    
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/entries.yml"
+        regexp: 'current'
+        replace: 'entries'
+    
+    #CONTRACTS
+    - name: Read Contracts
+      cisco.aci.aci_contract:
+        state: query
+      register: contracts
+      retries: 2
+        
+    - name: Add contracts to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ contracts  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/contracts.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/contracts.yml"
+        regexp: 'current'
+        replace: 'contracts'
+
+    #Subjects
+    - name: Read Subjects
+      cisco.aci.aci_contract_subject:
+        state: query
+      register: subjects
+      retries: 2
+        
+    - name: Add subjects to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ subjects  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/subjects.yml"
+    
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/subjects.yml"
+        regexp: 'current'
+        replace: 'subjects'
+
+    #Associated
+    - name: Read Associated
+      cisco.aci.aci_contract_subject_to_filter:
+        state: query
+      register: associated
+      retries: 2
+        
+    - name: Add Associated to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ associated  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/associated.yml"
+     
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/associated.yml"
+        regexp: 'current'
+        replace: 'associated'
+
+    #EPG binding provider
+    - name: Read EPGs Binding
+      cisco.aci.aci_epg_to_contract:
+        state: query
+        contract_type: provider
+      register: provider
+      retries: 2
+            
+    - name: Add epgs binding to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ provider | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/provider.yml"
+    
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/provider.yml"
+        regexp: 'current'
+        replace: 'provider'
+      
+     #EPG binding consumer
+    - name: Read EPGs Binding
+      cisco.aci.aci_epg_to_contract:
+        state: query
+        contract_type: consumer
+      register: consumer
+      retries: 2
+              
+    - name: Add epgs binding to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ consumer | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/consumer.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults/main/consumer.yml"
+        regexp: 'current'
+        replace: 'consumer'
+      

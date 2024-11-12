@@ -1,0 +1,93 @@
+---
+bds:
+-   fvBD:
+        attributes:
+            OptimizeWanBandwidth: 'no'
+            annotation: orchestrator:ansible
+            arpFlood: 'no'
+            bcastP: 225.1.95.16
+            descr: ''
+            dn: uni/tn-Ansible/BD-Ansible_bd
+            enableRogueExceptMac: 'no'
+            epClear: 'no'
+            hostBasedRouting: 'no'
+            intersiteBumTrafficAllow: 'no'
+            intersiteL2Stretch: 'no'
+            ipLearning: 'yes'
+            ipv6McastAllow: 'no'
+            limitIpLearnToSubnets: 'yes'
+            llAddr: '::'
+            mac: 00:22:BD:F8:19:FF
+            mcastARPDrop: 'yes'
+            mcastAllow: 'no'
+            mtu: inherit
+            multiDstPktAct: bd-flood
+            name: Ansible_bd
+            scope: '2654213'
+            seg: '16252853'
+            type: regular
+            unicastRoute: 'yes'
+            unkMacUcastAct: proxy
+            unkMcastAct: flood
+            v6unkMcastAct: flood
+        children:
+        -   fvRsMldsn:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    stateQual: default-target
+                    tCl: mldSnoopPol
+                    tDn: uni/tn-common/mldsnoopPol-default
+                    tRn: mldsnoopPol-default
+                    tType: name
+                    tnMldSnoopPolName: ''
+        -   fvRsBDToNdP:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    stateQual: default-target
+                    tCl: ndIfPol
+                    tContextDn: ''
+                    tDn: uni/tn-common/ndifpol-default
+                    tType: name
+        -   fvRsBdToEpRet:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    lcOwn: local
+                    resolveAct: resolve
+                    stateQual: default-target
+                    tCl: fvEpRetPol
+                    tDn: uni/tn-common/epRPol-default
+                    tType: name
+        -   fvRsIgmpsn:
+                attributes:
+                    annotation: ''
+                    forceResolve: 'yes'
+                    stateQual: default-target
+                    tCl: igmpSnoopPol
+                    tDn: uni/tn-common/snPol-default
+                    tType: name
+                    tnIgmpSnoopPolName: ''
+        -   fvRsCtx:
+                attributes:
+                    annotation: ''
+                    childAction: ''
+                    extMngdBy: ''
+                    forceResolve: 'yes'
+                    lcOwn: local
+                    modTs: '2024-06-25T19:46:21.714+00:00'
+                    monPolDn: uni/tn-common/monepg-default
+                    rType: mo
+                    rn: rsctx
+                    state: formed
+                    stateQual: none
+                    status: ''
+                    tCl: fvCtx
+                    tContextDn: ''
+                    tDn: uni/tn-Ansible/ctx-Ansible_vrf
+                    tRn: ctx-Ansible_vrf
+                    tType: name
+                    tnFvCtxName: Ansible_vrf
+                    uid: '0'
+                    userdom: all

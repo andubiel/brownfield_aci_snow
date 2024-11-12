@@ -1,0 +1,28 @@
+---
+aep:
+-   infraAttEntityP:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/infra/attentp-Ansible_aep
+            name: Ansible_aep
+        children:
+        -   infraProvAcc:
+                attributes:
+                    annotation: ''
+                    name: provacc
+                children:
+                -   infraRsFuncToEpg:
+                        attributes:
+                            annotation: ''
+                            encap: vlan-4
+                            forceResolve: 'yes'
+                            instrImedcy: lazy
+                            tDn: uni/tn-infra/ap-access/epg-default
+                -   dhcpInfraProvP:
+                        attributes:
+                            annotation: ''
+                            descr: ''
+                            mode: controller
+                            name: ''
+                           

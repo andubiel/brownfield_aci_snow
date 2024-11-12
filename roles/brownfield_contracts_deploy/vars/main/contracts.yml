@@ -1,0 +1,18 @@
+---
+contracts:
+-   vzBrCP:
+        attributes:
+            accessPrivilege: USER
+            annotation: orchestrator:ansible
+            descr: Created by AAP2.2 for web
+            dn: uni/tn-Ansible/brc-web
+            name: web
+            scope: context
+-   vzBrCP:
+        attributes:
+            annotation: orchestrator:ansible
+            descr: Created by AAP2.2 for database
+            dn: uni/tn-Ansible/brc-database
+            name: database
+            scope: context
+           

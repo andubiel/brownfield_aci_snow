@@ -1,0 +1,94 @@
+---
+- name: AEP AND PHYS AND VLAN POOL
+
+  #ignore_errors: true
+
+  block:
+    - name: Read CSV File csv_files/aci_vlan_pool.csv
+      read_csv:
+        path: ../csv_files/day0/aci_vlan_pool.csv # location of CSV file
+      register: aci_aci_vlan_pool
+      delegate_to: localhost
+
+    - name: Add a new VLAN Pool
+      cisco.aci.aci_vlan_pool:      
+        pool: "{{ vlan_pool_item.vlan_pool | default(omit, True)   }}"
+        pool_allocation_mode: "{{ vlan_pool_item.alloc | default(omit, True)  }}"
+      retries: 2
+      delay: 5
+      async: 60
+      poll: 0
+      loop: "{{ aci_aci_vlan_pool.list }}"
+      loop_control:
+        loop_var: vlan_pool_item
+        label: "{{ vlan_pool_item.vlan_pool }}"
+    
+    - name: Add a new VLAN Encap Block
+      cisco.aci.aci_vlan_pool_encap_block:      
+        pool: "{{ vl_pool_item.vlan_pool | default(omit, True) }}"
+        pool_allocation_mode: "{{ vl_pool_item.alloc | default(omit, True)  }}"
+        block_start: "{{ vl_pool_item.encap_from  | default(omit, True) }}"
+        block_end: "{{ vl_pool_item.encap_to  | default(omit, True) }}"
+        block_name: "{{ vl_pool_item.block_name | default(omit, True)  }}"
+      retries: 2
+      delay: 5
+      async: 60
+      poll: 0
+      loop: "{{ aci_aci_vlan_pool.list }}"
+      loop_control:
+        loop_var: vl_pool_item
+        label: "{{ vl_pool_item.block_name }}"
+
+    - name: Read CSV File csv_files/aci_fabric_access_policies.csv
+      read_csv:
+        path: ../csv_files/day0/aci_fabric_access_policies.csv # location of CSV file
+      register: aci_aep
+      delegate_to: localhost
+
+    - name: Add a new AEP
+      cisco.aci.aci_aep:
+        aep: "{{ aep_item.aep | default(omit, True) }}"
+        infra_vlan: true
+      retries: 2
+      delay: 5
+      async: 60
+      poll: 0
+      loop: "{{ aci_aep.list | default(omit, True)  }}"
+      loop_control:
+        loop_var: aep_item
+        label: "{{ aep_item.aep }}"
+
+    - name: Read CSV File csv_files/aci_vlan_pool.csv
+      read_csv:
+        path: ../csv_files/day0/aci_vlan_pool.csv # location of CSV file
+      register: aci_phys
+      delegate_to: localhost
+
+    - name: Add a new Physical Domain
+      cisco.aci.aci_domain:
+        domain: "{{ physical_item.domain | default(omit, True) }}"
+        domain_type: phys
+      retries: 2
+      delay: 5
+      async: 60
+      poll: 0
+      loop: "{{ aci_phys.list }}"
+      loop_control:
+        loop_var: physical_item
+        label: "{{ physical_item.domain }}"
+
+    - name: Bind a Physical Domain to a Vlan Pool
+      cisco.aci.aci_domain_to_vlan_pool:
+        domain: "{{ vlan_item.domain | default(omit, True)  }}"
+        domain_type: "{{ vlan_item.domain_type | default(omit, True) }}"
+        pool: "{{ vlan_item.vlan_pool | default(omit, True)  }}"
+        pool_allocation_mode: static
+      retries: 2
+      delay: 5
+      async: 60
+      poll: 0
+      loop: "{{ aci_phys.list }}"
+      loop_control:
+        loop_var: vlan_item
+        label: "{{ vlan_item.domain }}"
+         

@@ -1,0 +1,305 @@
+---
+controller_components:
+  - projects
+  - hosts
+  - groups
+  - credential_types
+  - credentials
+  - execution_environments
+  - hosts
+  - inventory_sources
+  - job_templates
+  - workflow_job_templates
+
+controller_projects:
+  - name: Student Project
+    organization: "Red Hat network organization"
+    scm_url: "http://ansible-1:3000/gitea/network-demos-repo.git"
+    scm_type: git
+    allow_override: true
+    state: present
+    scm_update_on_launch: yes
+
+controller_execution_environments:
+  - name: "Validated Network"
+    image: registry.gitlab.com/redhatautomation/validated-network-ee:latest
+    pull: missing
+
+controller_credential_types:
+  - name: Gitea Student
+    kind: cloud 
+    inputs:
+      fields:
+        - id: username
+          label: Username
+          type: string
+        - id: password
+          label: Password
+          secret: true
+          type: string
+        - id: email
+          label: Email
+          type: string
+      required:
+        - username
+        - password
+        - email
+    injectors:
+      extra_vars:
+        email: "{  { email | default ('{  { email }}') }}"
+        password: "{  { git_password | default ('{  { git_password }}') }}"
+        username: "{  { username | default ('{  { username }}') }}"
+        token: "{  { git_password | default ('{  { git_password }}') }}"
+
+controller_credentials:
+  - name: Gitea Credential
+    credential_type: Gitea Student
+    description: ""
+    inputs:
+      username: "gitea"
+      password: "gitea"
+      email: "admin@example.com"
+    organization: "Red Hat network organization"
+
+controller_hosts:
+  - name: apic1
+    inventory: "Workshop Inventory"
+    state: present
+    enabled: true
+    variables:
+      ansible_host: sandboxapicdc.cisco.com      
+      ansible_connection: ansible.netcommon.httpapi
+      ansible_network_os: cisco.aci.aci
+      ansible_user: admin
+      ansible_password: '!v3G@!4@Y'
+      ansible_httpapi_validate_certs: false
+      ansible_httpapi_use_ssl: true
+controller_groups:
+  - name: apic
+    hosts:
+      - apic1
+    inventory: "Workshop Inventory"
+    state: present
+
+controller_templates:
+  - name: "ACI-Day0-1-Config-Staging"
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_day0-1.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+
+  - name: "ACI-Rollback"
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_rollback.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+
+  - name: "ACI-Day2-Health-Check"
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_health_day2.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+
+  - name: "ACI-Brownfield-to-YAML"
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_brownfield_yaml.yml"
+    execution_environment: "Validated Network"
+    state: present
+    credentials:
+      - "Gitea Credential"
+
+  - name: ACI-Brownfield-Deploy
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_brownfield_deploy.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+    credentials:
+      - "Gitea Credential"
+
+  - name: ACI-Brownfield-Config
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_brownfield_config.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+    credentials:
+      - "Gitea Credential"
+
+  - name: ACI-Brownfield-Health-Check
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_brownfield_health.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+    credentials:
+      - "Gitea Credential"
+
+  - name: ACI-Rollback
+    organization: "Red Hat network organization"
+    inventory: "Workshop Inventory"
+    project: "Student Project"
+    playbook: "cisco_aci/playbooks/aci_rollback.yml"
+    execution_environment: "Validated Network"
+    state: "present"
+
+controller_workflows:
+  - name: 0-ACI-as-Code-Workflow
+    survey_enabled: yes
+    survey:
+      description: ""
+      name: ""
+      spec:
+        - question_name: "Enter your Username"
+          default: "admin"
+          new_question: true
+          question_description: ""
+          required: true
+          type: "text"
+          variable: "ansible_user"
+        - question_name: "Enter your Password"
+          default: "'!v3G@!4@Y'"
+          new_question: false
+          question_description: ""
+          required: true
+          type: "password"
+          variable: "ansible_password"
+        - question_name: "Validate APIC Certificate"
+          choices: "False\nTrue"
+          default: "False"
+          new_question: true
+          question_description: ""
+          required: true
+          type: "multiplechoice"
+          variable: "apic_validate_certs"
+    workflow_nodes:
+      - identifier: ACI-Day0-1-Config-Staging
+        unified_job_template:
+          name: ACI-Day0-1-Config-Staging
+          organization: 
+            name: "Red Hat network organization"
+          type: job_template
+        related:
+          success_nodes: 
+            - identifier: ACI-Day2-Health-Check
+          failure_nodes: 
+            - identifier: ACI-Rollback
+      - identifier: ACI-Day2-Health-Check
+        unified_job_template: 
+          name: ACI-Day2-Health-Check
+          organization: 
+            name: "Red Hat network organization"
+          type: job_template
+      - identifier: ACI-Rollback
+        unified_job_template: 
+          name: ACI-Rollback
+          organization: 
+            name: "Red Hat network organization"
+          type: job_template
+
+  - name: 0-ACI-Brownfield-Workflow
+    organization: "Red Hat network organization"
+    survey_enabled: yes
+    survey_spec:
+      {
+        "description": "",
+        "name": "",
+        "spec":
+          [
+            {
+              "choices": "",
+              "default": "admin",
+              "max": 1024,
+              "min": 0,
+              "new_question": true,
+              "question_description": "",
+              "question_name": "Enter your Username",
+              "required": true,
+              "type": "text",
+              "variable": "ansible_user",
+            },
+            {
+              "choices": "",
+              "default": "!v3G@!4@Y",
+              "formattedChoices":
+                [{ "choice": "", "id": 0, "isDefault": false }],
+              "max": 1024,
+              "min": 0,
+              "new_question": false,
+              "question_description": "",
+              "question_name": "Enter your Password",
+              "required": true,
+              "type": "password",
+              "variable": "ansible_password",
+            },
+            {
+              "choices": "False\nTrue",
+              "default": "False",
+              "max": 1024,
+              "min": 0,
+              "new_question": true,
+              "question_description": "",
+              "question_name": "Validate APIC Certificate",
+              "required": true,
+              "type": "multiplechoice",
+              "variable": "apic_validate_certs",
+            },
+          ],
+      }
+    workflow_nodes:
+    - name: ACI-Rollback
+      identifier: ACI-Rollback
+      workflow: 0-ACI-Brownfield-Workflow
+      unified_job_template: ACI-Rollback
+    - name: ACI-Brownfield-Health-Check
+      identifier: ACI-Brownfield-Health-Check
+      workflow: 0-ACI-Brownfield-Workflow
+      unified_job_template: ACI-Brownfield-Health-Check 
+    - name: ACI-Brownfield-Config
+      identifier: ACI-Brownfield-Config
+      workflow: 0-ACI-Brownfield-Workflow
+      unified_job_template: ACI-Brownfield-Config
+      success_nodes: ACI-Brownfield-Health-Check
+      failure_nodes: ACI-Rollback
+    - name: ACI-Brownfield-Deploy
+      identifier: ACI-Brownfield-Deploy
+      workflow: 0-ACI-Brownfield-Workflow
+      unified_job_template: ACI-Brownfield-Deploy
+      success_nodes: ACI-Brownfield-Config
+      failure_nodes: ACI-Rollback
+    - name: Change-Approval
+      identifier: Change-Approval
+      workflow_job_template: 0-ACI-Brownfield-Workflow
+      organization: "Red Hat network organization"
+      approval_node:
+        name: "Change-Approval"
+        timeout: 0
+      state: present
+    - name: Change-Approval
+      identifier: Change-Approval
+      workflow_job_template: 0-ACI-Brownfield-Workflow
+      organization: "Red Hat network organization"
+      approval_node:
+        name: "Change-Approval"
+      state: present
+      success_nodes:
+        - ACI-Brownfield-Deploy
+      ignore_errors: true
+    - name: ACI-Brownfield-to-YAML
+      identifier: ACI-Brownfield-to-YAML
+      workflow: 0-ACI-Brownfield-Workflow
+      unified_job_template: ACI-Brownfield-to-YAML
+      success_nodes: Change-Approval
+
+...

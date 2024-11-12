@@ -1,0 +1,51 @@
+---
+- name: L3OUT
+
+  block:
+    - name: Read Contract Info csv_files/day1/aci_layer3out.csv
+      read_csv:
+        path: ../csv_files/day1/aci_layer3out.csv # location of CSV file
+      register: aci_l3out
+      delegate_to: localhost
+
+    - name: Add a new L3Out
+      cisco.aci.aci_l3out:
+        tenant: "{{ l3out_item.tenant | default(omit, True) }}"
+        name: "{{ l3out_item.l3out_name | default(omit, True) }}"
+        domain: "{{ l3out_item.node_profile | default(omit, True) }}"
+        vrf: "{{ l3out_item.vrf | default(omit, True) }}"
+        route_control: export
+        l3protocol: static
+      retries: 2
+      delay: 5
+      loop: "{{ aci_l3out.list }}"
+      loop_control:
+        loop_var: l3out_item
+        label: "{{ l3out_item.l3out_name }}"
+
+    - name: Add a new ExtEpg
+      cisco.aci.aci_l3out_extepg:
+        tenant: "{{ ext_item.tenant | default(omit, True) }}"
+        l3out: "{{ ext_item.l3out_name | default(omit, True) }}"
+        name: "{{ ext_item.extepg_name | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_l3out.list }}"
+      loop_control:
+        loop_var: ext_item
+        label: "{{ ext_item.extepg_name }}"
+
+    - name: Bind a contract to an external EPG
+      cisco.aci.aci_l3out_extepg_to_contract:
+        tenant: "{{ map_item.tenant | default(omit, True) }}"
+        l3out: "{{ map_item.l3out_name | default(omit, True) }}"
+        extepg: "{{ map_item.extepg_name | default(omit, True) }}"
+        contract: "{{ map_item.contract_name | default(omit, True) }}"
+        contract_type: "{{ map_item.contract_type | default(omit, True) }}"
+      retries: 2
+      delay: 5
+      loop: "{{ aci_l3out.list }}"
+      loop_control:
+        loop_var: map_item
+        label: "{{ map_item.contract_name }}"
+        

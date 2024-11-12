@@ -1,0 +1,28 @@
+---
+- name: ROLLBACK TO ORIGINAL BASELINE CONFIG
+  hosts: apic
+  gather_facts:
+    no
+ 
+  tasks:
+    - name: Read Snapshot
+      cisco.aci.aci_config_snapshot:    
+        state: query
+        export_policy: demo
+      register: snap
+
+    - name: print to baseline Snapshot
+      debug:
+       # var: snap.current[0].configSnapshot.attributes.name
+       var: snap.current[0].configSnapshotCont.children[0].configSnapshot.attributes.name
+    - name: Rollback Configuration
+      cisco.aci.aci_config_rollback:     
+        snapshot: "{{ snap.current[0].configSnapshotCont.children[0].configSnapshot.attributes.name }}"
+        import_policy: rollback_config
+        export_policy: demo
+        state: rollback
+        description: "Rollback initial config"
+        import_mode: atomic
+        import_type: replace
+        fail_on_decrypt: yes
+      

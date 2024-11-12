@@ -1,0 +1,77 @@
+---
+- name: Validate ACI Health for New Tenants
+  hosts: apic
+  gather_facts: no
+
+  tasks:
+
+  - include_vars:
+     file: '../roles/brownfield_tenant_deploy/old/main/tenants.yml'
+
+  - name: load system role
+    include_role:
+       name: "{{ item }}"
+    loop: 
+      - "../roles/brownfield_health"
+
+  - name: Retrieve a repository from a distant location and make it available to the local EE
+    ansible.scm.git_retrieve:
+      origin:
+        url: "http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+      parent_directory: /tmp
+      branch:
+          name: master
+          duplicate_detection: no  
+    run_once: true
+    register: repository
+    delegate_to: localhost
+
+  - name: Enable VARs Configs by Renaming
+    ansible.builtin.copy: 
+      src: "{{ item.src }}" 
+      dest: "{{ item.dest }}"
+    loop:
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/old/main/"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/vars/main/"
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/old/main/"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/vars/main/"     
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/old/main/"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/vars/main/"
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/old/main/"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/vars/main/"
+    delegate_to: localhost
+    ignore_errors: true
+  
+  - name: Delete Old dir
+    ansible.builtin.file: 
+      path: "{{ item.src }}" 
+      state: absent
+    loop:
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/old"
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/old"   
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/old"
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/old"
+
+  - name: Delete Defaults dir
+    ansible.builtin.file: 
+      path: "{{ item.src }}" 
+      state: absent
+    loop:
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/defaults"
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults"   
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults"
+      - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/defaults"
+
+  - name: Publish the changes
+    ansible.scm.git_publish:
+      path: "{{ repository['path'] }}"
+      token: "{{ password }}"
+      user:
+        name: "{{ username }}"
+        email: "{{ email }}"
+    delegate_to: localhost
+    run_once: true  
+
+
+  
+    

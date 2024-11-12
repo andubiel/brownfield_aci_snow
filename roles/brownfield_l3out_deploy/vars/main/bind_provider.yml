@@ -1,0 +1,14 @@
+---
+bind_provider:
+-   fvRsProv:
+        attributes:
+            accessPrivilege: USER
+            annotation: orchestrator:ansible
+            ctrctUpd: ctrct
+            dn: uni/tn-Ansible/out-Ansible_l3out/instP-Ansible_external_corporate/rsprov-web
+            forceResolve: 'yes'
+            tCl: vzBrCP
+            tDn: uni/tn-Ansible/brc-web
+            tType: name
+            tnVzBrCPName: web
+        

@@ -1,0 +1,20 @@
+---
+- name: Day0-1 deployment
+  hosts: apic
+  gather_facts: no
+  
+  tasks:
+  - name: load system role
+    include_role:
+       name: "{{ item }}"
+    loop: 
+        - "../roles/day0_snapshot"
+        - "../roles/day0_fabric_access_policies" 
+        - "../roles/day0_fabric_access_port_to_profile"
+        - "../roles/day0_aep_pools"
+        - "../roles/day1_tenant_epg_bindings"
+        - "../roles/day1_contracts"
+        - "../roles/day1_l3out"
+
+
+    

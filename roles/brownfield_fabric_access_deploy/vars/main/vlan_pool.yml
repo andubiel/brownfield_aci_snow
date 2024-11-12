@@ -1,0 +1,10 @@
+changed: false
+vlan_pool:
+-   fvnsVlanInstP:
+        attributes:
+            allocMode: static
+            annotation: orchestrator:ansible
+            descr: ''
+            dn: uni/infra/vlanns-[Ansible_general_pool]-static
+            name: Ansible_general_pool
+          

@@ -1,0 +1,8 @@
+changed: false
+phys:
+-   l3extDomP:
+        attributes:
+            annotation: orchestrator:ansible
+            dn: uni/l3dom-Ansible_corporate_external
+            name: Ansible_corporate_external
+            

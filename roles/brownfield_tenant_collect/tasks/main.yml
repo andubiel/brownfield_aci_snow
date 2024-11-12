@@ -1,0 +1,143 @@
+---
+- name: READ TENANT CONFIG
+
+  #ignore_errors: true
+  block:
+    #TENANTS
+    - name: Create a defaults directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/"
+        state: directory
+        mode: '0755'
+      
+    - name: Read Tenant
+      cisco.aci.aci_tenant:
+        state: query
+      register: tenants
+      retries: 2
+      
+    - name: Add tenants to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ tenants | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/tenants.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/tenants.yml"
+        regexp: 'current'
+        replace: 'tenants'
+        
+   #APPLICATION PROFILES
+    - name: Read Application Policy
+      cisco.aci.aci_ap:
+        state: query
+      register: aps
+      retries: 2
+      
+    - name: Add aps to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ aps  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/aps.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/aps.yml"
+        regexp: 'current'
+        replace: 'aps'
+        
+    #VRFs
+    - name: Read VRF
+      cisco.aci.aci_vrf:
+        state: query
+      register: vrfs
+      retries: 2
+      
+    - name: Add vrfs to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ vrfs  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/vrfs.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/vrfs.yml"
+        regexp: 'current'
+        replace: 'vrfs'
+        
+    #BRIDGE DOMAINS
+    - name: Read BDs
+      cisco.aci.aci_bd:
+        state: query
+      register: bds
+      retries: 2
+      
+    - name: Add bds to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ bds  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/bds.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/bds.yml"
+        regexp: 'current'
+        replace: 'bds'
+        
+    #BD SUBNETS
+    - name: Read BD SUBNETs
+      cisco.aci.aci_bd_subnet:  
+        state: query
+      register: bd_subnets
+      retries: 2  
+
+    - name: Add bd_subnets to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ bd_subnets  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/bd_subnets.yml"
+      
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/bd_subnets.yml"
+        regexp: 'current'
+        replace: 'bd_subnets'
+        
+    #EPGs
+    - name: Read EPGs
+      cisco.aci.aci_epg:   
+        state: query
+      register: epgs
+      retries: 2
+      
+    - name: Add epgs to the roles defaults
+      ansible.builtin.copy:
+        content: "{{ epgs  | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/epgs.yml"
+        
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/epgs.yml"
+        regexp: 'current'
+        replace: 'epgs'
+        
+    #Static Bindings to EPGs
+    - name: "cisco.aci.aci_static_binding_to_epg"
+      cisco.aci.aci_static_binding_to_epg:     
+        state: query
+      register: static_bindings
+      retries: 2
+      
+    - name: Add static_bindings to epgs to the roles vars
+      ansible.builtin.copy:
+        content: "{{ static_bindings | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/static_bindings.yml"
+       
+    - name: Modify file
+      ansible.builtin.replace:
+        path: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/static_bindings.yml"
+        regexp: 'current'
+        replace: 'static_bindings'
+        
+
+    
+
+    
+
+     

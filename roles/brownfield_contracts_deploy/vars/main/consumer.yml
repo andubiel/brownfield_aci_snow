@@ -1,0 +1,13 @@
+changed: false
+consumer:
+-   fvRsCons:
+        attributes:
+            annotation: orchestrator:ansible
+            ctrctUpd: ctrct
+            dn: uni/tn-Ansible/ap-Ansible_AP/epg-db/rscons-web
+            forceResolve: 'yes'
+            tCl: vzBrCP
+            tDn: uni/tn-Ansible/brc-web
+            tType: name
+            tnVzBrCPName: web
+           

@@ -1,0 +1,27 @@
+---
+- name: VALIDATE THE TENANT HEALTH SCORE
+
+  block:
+    - name: Read CSV File
+      read_csv:
+        path: ../csv_files/day1/aci_static_binding.csv # location of CSV file
+      register: aci_static_binding_to_epg
+      delegate_to: localhost
+
+    - name: Get Tenant Health Score
+      aci_rest:
+        path: /api/node/mo/uni/tn-{{aci_static_binding_to_epg.list[0].tenant}}/health.json?query-target=self
+        method: get
+      register: health
+
+    - name: Set_fact
+      set_fact:
+        health_score: "{{health.imdata[0].healthInst.attributes.cur}}"
+
+    #- name: Validate Tenant Health
+
+    - name: Assert The Tenant Health Score is equal or greater than (94)
+      assert:
+        that: health_score | int >= 94
+        fail_msg: "Failure! The The Tenant Health Score is {{health_score}} Please review faults"
+        success_msg: "Success! The Tenant Health Score is {{health_score}}"
