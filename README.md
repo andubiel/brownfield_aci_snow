@@ -10,7 +10,8 @@ Demonstrate building an ACI Fabric as Code within an existing ACI fabric using A
 In this demo we will find a cure for the proverbial ACI GUI `Death by a thousand clicks`!!!
 
 *  Brownfield ACI-as-Code with YAML files
-This demo is for ACI operators who have an existing ACI fabric with many configurations. Using the cisco.aci collection and roles, we can query the existing managed objects and save as YAML configuration files. These variables are subsequently mapped the to the appropriate ansible modules to modify existing or deploy new ACI configurations. Optional, check for configuration drift.
+
+- This demo is for ACI operators who have an existing ACI fabric with many configurations. Using the cisco.aci collection and roles, we can query the existing managed objects and save as YAML configuration files. These variables are subsequently mapped the to the appropriate ansible modules to modify existing or deploy new ACI configurations. Optional, check for configuration drift.
 
 * This demo uses Ansible and Service Now (SNOW) to open tickets when there are errors in the configuration.
 
