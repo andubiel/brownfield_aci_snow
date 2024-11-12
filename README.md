@@ -3,9 +3,8 @@
 # Summary of Demo
 brownfield_aci_snow
 
-
 ## Objective
-Demonstrate building an ACI Fabric as Code within an existing ACI fabric using Ansible and AAP.This README includes two demos. 
+Demonstrate building an ACI Fabric as Code within an existing ACI fabric using Ansible and AAP.
 
 ## Overview
 In this demo we will find a cure for the proverbial ACI GUI `Death by a thousand clicks`!!!
