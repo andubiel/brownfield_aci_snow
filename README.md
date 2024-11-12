@@ -13,7 +13,7 @@ In this demo we will find a cure for the proverbial ACI GUI `Death by a thousand
 
 - This demo is for ACI operators who have an existing ACI fabric with many configurations. Using the cisco.aci collection and roles, we can query the existing managed objects and save as YAML configuration files. These variables are subsequently mapped the to the appropriate ansible modules to modify existing or deploy new ACI configurations. Optional, check for configuration drift.
 
-* This demo uses Ansible and Service Now (SNOW) to open tickets when there are errors in the configuration.
+* This demo uses Ansible and Service Now (SNOW) to open tickets whenever there are errors in the configuration.
 
 ## Devnet ACI Sandbox
 The hosts.yml file in this demo can be modified to run in the Cisco Devnet ACI always on or reserved sandboxes. The latter requires a vpn connection.
