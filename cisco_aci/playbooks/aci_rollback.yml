@@ -1,0 +1,90 @@
+---
+- name: ROLLBACK TO ORIGINAL BASELINE CONFIG
+  hosts: apic
+  gather_facts:
+    no
+ 
+  tasks:
+    - name: Read Snapshot
+      cisco.aci.aci_config_snapshot:    
+        state: query
+        export_policy: demo
+      register: snap
+
+    - name: print to baseline Snapshot
+      debug:
+       # var: snap.current[0].configSnapshot.attributes.name
+       var: snap.current[0].configSnapshotCont.children[0].configSnapshot.attributes.name
+    - name: Rollback Configuration
+      cisco.aci.aci_config_rollback:     
+        snapshot: "{{ snap.current[0].configSnapshotCont.children[0].configSnapshot.attributes.name }}"
+        import_policy: rollback_config
+        export_policy: demo
+        state: rollback
+        description: "Rollback initial config"
+        import_mode: atomic
+        import_type: replace
+        fail_on_decrypt: yes
+
+    - name: Retrieve a repository from a distant location and make it available to the local EE
+      ansible.scm.git_retrieve:
+        origin:
+          url: "http://gitea:gitea123@aap:3000/gitea/brownfield_aci_snow.git"
+        parent_directory: /tmp
+        branch:
+            name: main
+            duplicate_detection: no  
+      run_once: true
+      register: repository
+      delegate_to: localhost
+
+    - name: Enable VARs Configs by Renaming
+      ansible.builtin.copy: 
+        src: "{{ item.src }}" 
+        dest: "{{ item.dest }}"
+      loop:
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/old/main/"
+          dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/vars/main/"
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/old/main/"
+          dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/vars/main/"     
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/old/main/"
+          dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/vars/main/"
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/old/main/"
+          dest: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/vars/main/"
+      delegate_to: localhost
+      ignore_errors: true
+    
+    - name: Delete Old dir
+      ansible.builtin.file: 
+        path: "{{ item.src }}" 
+        state: absent
+      loop:
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/old"
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/old"   
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/old"
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/old"
+
+    - name: Delete Defaults dir
+      ansible.builtin.file: 
+        path: "{{ item.src }}" 
+        state: absent
+      loop:
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_fabric_access_deploy/defaults"
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_tenant_deploy/defaults"   
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_contracts_deploy/defaults"
+        - src: "{{ repository['path'] }}/cisco_aci/roles/brownfield_l3out_deploy/defaults"
+
+    - name: Publish the changes
+      ansible.scm.git_publish:
+        path: "{{ repository['path'] }}"
+        token: "{{ password }}"
+        user:
+          name: "{{ username }}"
+          email: "{{ email }}"
+      delegate_to: localhost
+      run_once: true  
+
+
+    
+      
+        

@@ -31,7 +31,14 @@ https://sandboxapicdc.cisco.com
 # Demo Steps
 Brownfield ACI-as-Code with YAML files
 
-1. Launch the 0-ACI-as-Brownfield-Workflow to ingest the current ACI fabric configurations as code.
+# Add an Error to brownfield_tenant_deploy/vars/main
+1. Launch the 0-ACI-Brownfield-Workflow 
+This will invoke a Service Now Ticket and Rollback after we check the config diff below
+####  Examine the SNOW Ticket from the error
+
+# Start ACI Brownfield Demo with no Error
+1. Launch the 0-ACI-Brownfield-Workflow to ingest the current ACI fabric configurations as code.
+
 #### Sync your local VSCode repo 
 In our demo we have installed gitea. Other git options will work as well.
 ~~~
@@ -51,6 +58,7 @@ git push
 6.  Review the job output for ACI-Brownfield-Deploy job-template (new configs) and ACI-Brownfield-Config job-template for (Existing Configs)
 7.  Take a look at the ACI-Day2-Health-Check.  Take a look at what goes into the health score and why it is important.
 8. Config Drift with Diff
+
 
 #### step 1 - Rerun the 0-ACI-as-Brownfield-Workflow 
 This time we will pull in the changes made in the afore mentioned `vars` because they become existing configurations in the default folders written by the playbooks in each role.
@@ -110,9 +118,12 @@ change directory to cisco_aci/roles/brownfield_tenant_deploy/defaults/main/
 cd cisco_aci/roles/brownfield_tenant_deploy/defaults/main/
 ~~~
 Diff command:
-In the following example you will observe the two tenants with modified descriptions (StuPedazzo, EQUI_UNTRUSTED_PROD_TNT ). Secondly, the new tenant `ansible` is appended to th bottom of the config. 
+In the following example you will observe the two tenants with modified descriptions (StuPedazzo, EQUI_UNTRUSTED_PROD_TNT ). Secondly, the new tenant `ansible` is appended to the bottom of the config. 
 ~~~
-$ git diff c3b8faa20f8d5dc889b10c30a421324862519ef7 1b6f83e6d489e7e3ec064e89865d7ed29d6adb5d tenants.yml
+git diff c3b8faa20f8d5dc889b10c30a421324862519ef7 1b6f83e6d489e7e3ec064e89865d7ed29d6adb5d tenants.yml
+~~~
+output:
+~~~
 diff --git a/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/tenants.yml b/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/tenants.yml
 index 068d06e..1eee9ce 100644
 --- a/cisco_aci/roles/brownfield_tenant_deploy/defaults/main/tenants.yml
@@ -256,8 +267,7 @@ index 068d06e..1eee9ce 100644
 (END)
 ~~~
 
-# Optional add Error
-This will invoke a Service Now Ticket and Rollback
+
 
 
 # Key Takeaways

@@ -1,0 +1,8 @@
+---
+- name: Snapshot
+  block:
+   
+    - name: Create snapshot 
+      aci_config_snapshot:
+        export_policy: demo
+        max_count: 3

@@ -1,0 +1,20 @@
+---
+- name: Open Ticket for failed ACI configuration
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+
+  - name: Create SNOW ticket 
+    servicenow.itsm.incident:
+      instance:
+        host: "{{ SN_HOST }}"
+        username: "{{ SN_USERNAME }}"
+        password: "{{ SN_PASSWORD }}"
+      state: new
+      impact: high
+      urgency: high
+      caller: admin
+      description: "{{ error }}"
+      short_description: "The ACI Deployment Failed and was Rolled Back"
+    delegate_to: localhost
