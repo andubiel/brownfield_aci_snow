@@ -271,13 +271,12 @@ index 068d06e..1eee9ce 100644
 
 
 # Key Takeaways
-* Easy migration from postman to Ansible with csv files
 * No need to work with the APIC GUI or APIs directly
 * Easy migration to IaC methodologies (gitops, webhook triggers etc)
 * Easily convert existing ACI managed objects to YAML configurations
 * Easily create health checks to verify the operation state of the ACI fabric
 * Infra as Code anf GitOps allow for easy diff checks to manage configuration drift etc
-* Easy integration between Ansible and Service Now
+* Easy integration between Ansible and ServiceNow
 
 ## Return to Demo Menu
  - [Menu of Demos](../README.md)
